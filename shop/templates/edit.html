@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Редагувати | PC Store</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0c10; color: white; padding: 40px; display: flex; justify-content: center; }
+        .form-box { background: #141a22; padding: 40px; border-radius: 16px; width: 500px; border: 1px solid #45f3ff33; box-shadow: 0 0 20px rgba(0,245,255,0.1); }
+        h2 { color: #ffb703; text-align: center; margin-top: 0; text-transform: uppercase; }
+        label { display: block; margin-top: 15px; color: #8b9bb4; font-size: 0.85rem; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 6px; background: #1f2833; border: 1px solid #2f3b4c; color: white; border-radius: 8px; box-sizing: border-box; outline: none; }
+        .spec-group { background: rgba(255,183,3,0.03); padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px dashed rgba(255,183,3,0.3); }
+        .spec-group h4 { margin: 0 0 10px 0; color: #00f5ff; text-transform: uppercase; font-size: 0.8rem; }
+        button { width: 100%; padding: 14px; background: #5865F2; color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-top: 25px; cursor: pointer; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>Редагування заліза</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label>Категорія:</label>
+            <select name="category" id="id_category" required>
+                {% for code, name in categories %}
+                    <option value="{{ code }}" {% if product.category == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <label>Бренд:</label>
+            <select name="brand" id="id_brand" required></select>
+            <label>Назва моделі:</label>
+            <input type="text" name="name" value="{{ product.name }}" required>
+            <label>Ціна (₴):</label>
+            <input type="number" name="price" value="{{ product.price }}" required>
+            <label>Фото:</label>
+            <input type="file" name="image">
+            <label>Загальний опис:</label>
+            <textarea name="description" rows="3">{{ product.description }}</textarea>
+            <div class="spec-group" id="specs_container">
+                <h4>Технічні характеристики</h4>
+                <div id="dynamic_fields"></div>
+            </div>
+            <button type="submit">Зберегти зміни</button>
+        </form>
+        <a href="{% url 'home' %}" style="display:block; text-align:center; margin-top:15px; color:#8b9bb4; text-decoration:none;">Скасувати</a>
+    </div>
+    <script>
+        const categoryBrands = {{ category_brands|safe }};
+        const specsTemplates = JSON.parse('{{ specs_templates|safe }}');
+        const currentProductSpecs = {{ product.specs|safe }};
+        const savedBrand = "{{ product.brand }}";
+        const categorySelect = document.getElementById('id_category');
+        const brandSelect = document.getElementById('id_brand');
+        const dynamicFields = document.getElementById('dynamic_fields');
+
+        function updateForm() {
+            const cat = categorySelect.value;
+            brandSelect.innerHTML = ''; dynamicFields.innerHTML = '';
+            if(cat in categoryBrands) {
+                categoryBrands[cat].forEach(b => {
+                    let opt = document.createElement('option');
+                    opt.value = b; opt.textContent = b;
+                    if(b === savedBrand) opt.selected = true;
+                    brandSelect.appendChild(opt);
+                });
+            }
+            if(cat in specsTemplates) {
+                for(let field in specsTemplates[cat]) {
+                    let lbl = document.createElement('label'); lbl.textContent = field + ":";
+                    let inp = document.createElement('input'); inp.type = "text"; inp.name = "spec_" + field;
+                    inp.value = currentProductSpecs[field] || '';
+                    dynamicFields.appendChild(lbl); dynamicFields.appendChild(inp);
+                }
+            }
+        }
+        updateForm();
+        categorySelect.addEventListener('change', updateForm);
+    </script>
+</body>
+</html>

@@ -1,2 +1,3 @@
-# shop_electronics
-База даних для онлайн електронікі
+# Magazine_pc
+Magazine pc 
+python manage.py runserver

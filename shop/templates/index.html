@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>PC Store | Premium Tech</title>
+    <style>
+        /* ================================================== */
+        /* БАЗОВІ НАЛАШТУВАННЯ ТА ТЕМИ (СКЛО / ЧОРНА)       */
+        /* ================================================== */
+        :root {
+            --bg-main: #e2e8f0;
+            --bg-card: rgba(255, 255, 255, 0.45);
+            --bg-sidebar: rgba(255, 255, 255, 0.65);
+            --accent: #ff2a2a;
+            --accent-hover: #e01b1b;
+            --accent-glow: rgba(255, 42, 42, 0.3);
+
+            /* ЗЕЛЕНИЙ НЕОН ДЛЯ КНОПОК */
+            --btn-gradient: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+            --btn-glow: rgba(34, 197, 94, 0.4);
+
+            /* ПУРПУРНИЙ НЕОН ДЛЯ КНОПКИ СТВОРЕННЯ ТОВАРУ */
+            --btn-add-gradient: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            --btn-add-glow: rgba(139, 92, 246, 0.4);
+
+            --text-light: #0f172a;
+            --text-main: #334155;
+            --border: rgba(255, 255, 255, 0.4);
+            --border-card: rgba(255, 255, 255, 0.5);
+            --gray-muted: #64748b;
+            --shadow: 0 20px 40px rgba(0,0,0,0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --card-img-bg: #ffffff;
+        }
+
+        body.theme-black {
+            --bg-main: #0a0f1d;
+            --bg-card: rgba(21, 29, 43, 0.65);
+            --bg-sidebar: #111827;
+            --accent: #ff0055;
+
+            /* Кислотно-зелений кіберпанк для чорної теми */
+            --btn-gradient: linear-gradient(135deg, #00ff66 0%, #00bc52 100%);
+            --btn-glow: rgba(0, 255, 102, 0.5);
+
+            /* Електрик-вайолет для кнопки додавання в чорній темі */
+            --btn-add-gradient: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            --btn-add-glow: rgba(168, 85, 247, 0.5);
+
+            --text-light: #f8fafc;
+            --text-main: #94a3b8;
+            --border: rgba(255, 255, 255, 0.05);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --gray-muted: #475569;
+            --shadow: 0 15px 35px rgba(0,0,0,0.5);
+            --card-img-bg: #1f2937;
+        }
+
+        /* Кастомний скролбар */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        body.theme-black ::-webkit-scrollbar-thumb { background: #334155; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            gap: 25px;
+            -webkit-font-smoothing: antialiased;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        .layout-wrapper { display: flex; gap: 25px; flex: 1; }
+
+        /* БІЧНА ПАНЕЛЬ */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            height: fit-content;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        .sidebar h3 {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 0;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            position: relative;
+        }
+        .sidebar h3::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            width: 35px; height: 2px; background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        .sidebar:hover h3::after { width: 100%; }
+
+        .category-link {
+            display: block; padding: 12px; color: var(--text-main); text-decoration: none;
+            border-radius: 10px; font-size: 0.95rem; font-weight: 500; transition: var(--transition);
+        }
+        .category-link:hover { background: rgba(255, 42, 42, 0.05); color: var(--accent); padding-left: 16px; }
+        .category-link.active {
+            background: var(--text-light); color: var(--bg-main); font-weight: bold;
+            box-shadow: var(--shadow);
+        }
+        .brand-list { padding-left: 18px; display: flex; flex-direction: column; gap: 2px; margin-top: 5px; }
+        .brand-link { display: block; padding: 6px; color: var(--gray-muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+        .brand-link:hover { color: var(--text-light); }
+        .brand-link.active { color: var(--accent); font-weight: bold; }
+
+        /* ОСНОВНИЙ КОНТЕНТ */
+        .main-content { flex: 1; display: flex; flex-direction: column; gap: 0px; }
+
+        /* НАВБАР ТА АНІМОВАНЕ ЛОГО */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-sidebar); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 15px 30px; border-radius: 16px; margin-bottom: 25px;
+            border: 1px solid var(--border); box-shadow: var(--shadow); transition: var(--transition);
+        }
+
+        /* ЧОРНО-ЧЕРВОНИЙ ПЕРЕЛИВ ДЛЯ PC STORE */
+        .navbar h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0e1118 0%, #ff0055 50%, #0e1118 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: logo-burn 4s linear infinite;
+            filter: drop-shadow(0 0 10px rgba(255, 0, 85, 0.35));
+            transition: var(--transition);
+        }
+
+        @keyframes logo-burn {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .navbar h2:hover {
+            filter: drop-shadow(0 0 18px rgba(255, 0, 85, 0.85));
+            transform: scale(1.02);
+        }
+
+        /* ПОШУК */
+        .search-form { flex: 1; max-width: 320px; display: flex; gap: 10px; margin: 0 20px; }
+        .search-form input {
+            width: 100%; padding: 11px 16px; background: rgba(0,0,0,0.03);
+            border: 1px solid var(--border); color: var(--text-light); border-radius: 10px;
+            outline: none; transition: var(--transition);
+        }
+        body.theme-black .search-form input { background: rgba(255,255,255,0.03); }
+        .search-form input:focus { border-color: rgba(255, 42, 42, 0.4); background: var(--bg-card); box-shadow: 0 0 12px rgba(255, 42, 42, 0.1); }
+        .search-form button {
+            padding: 11px 20px; background: var(--text-light); color: var(--bg-main);
+            border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: var(--transition);
+        }
+        .search-form button:hover { background: var(--accent); color: white; }
+
+        /* НАВІГАЦІЯ ПРАВОРУЧ */
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .cart-btn, .compare-btn {
+            color: var(--text-light); background: rgba(0,0,0,0.01); padding: 10px 18px;
+            border-radius: 10px; text-decoration: none; border: 1px solid var(--border);
+            font-weight: 600; font-size: 0.88rem; transition: var(--transition);
+        }
+        body.theme-black .cart-btn, body.theme-black .compare-btn { background: rgba(255,255,255,0.02); }
+        .cart-btn:hover { border-color: var(--accent); background: rgba(255,42,42,0.03); color: var(--accent); }
+        .compare-btn:hover { border-color: #ffaa00; color: #ffaa00; }
+
+        /* КНОПКА СТВОРЕННЯ ТОВАРУ */
+        .admin-add-product-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--btn-add-gradient); color: white !important;
+            padding: 10px 18px; border-radius: 10px; text-decoration: none;
+            font-weight: 700; font-size: 0.88rem; border: none;
+            box-shadow: 0 4px 15px var(--btn-add-glow);
+            transition: var(--transition);
+        }
+        .admin-add-product-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--btn-add-glow);
+            filter: brightness(1.1);
+        }
+        .admin-add-product-btn:active { transform: translateY(1px); }
+
+        /* КНОПКА ТЕМИ (СОНЕЧКО / МІСЯЦЬ) */
+        .theme-toggle-btn {
+            background: var(--border); color: var(--text-light); border: 1px solid var(--border);
+            width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
+            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+            transition: var(--transition); box-shadow: var(--shadow);
+        }
+        .theme-toggle-btn:hover { transform: scale(1.08) rotate(15deg); background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        /* АВТЕНТИФІКАЦІЯ */
+        .auth-btn-login { color: var(--text-light); text-decoration: none; font-weight: 600; font-size: 0.88rem; padding: 10px 16px; border-radius: 10px; transition: background 0.2s; }
+        .auth-btn-login:hover { background: rgba(0,0,0,0.04); }
+        .auth-btn-register {
+            background: var(--accent); color: white !important; text-decoration: none;
+            font-weight: bold; font-size: 0.88rem; padding: 10px 18px; border-radius: 10px;
+            box-shadow: 0 4px 12px var(--accent-glow); transition: var(--transition);
+        }
+        .auth-btn-register:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+        /* ІНДИКАТОР АДМІНА */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;
+        }
+        .status-badge.admin { background: rgba(255,42,42,0.1); color: var(--accent); border: 1px solid rgba(255,42,42,0.2); }
+        .status-badge.admin .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s infinite; }
+        .status-badge.user { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+        .status-badge.user .dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 42, 42, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 42, 42, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 42, 42, 0); }
+        }
+
+        /* СОРТУВАННЯ */
+        .sort-block {
+            margin-bottom: 25px; background: var(--bg-sidebar); padding: 10px 20px;
+            border-radius: 12px; display: flex; gap: 12px; border: 1px solid var(--border); transition: var(--transition);
+            box-shadow: var(--shadow); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        }
+        .sort-block a { color: var(--text-main); text-decoration: none; font-size: 0.88rem; padding: 8px 16px; border-radius: 8px; transition: var(--transition); font-weight: 600; }
+        .sort-block a:hover { color: var(--accent); background: rgba(255, 42, 42, 0.08); }
+        .sort-block a.active {
+            color: var(--bg-main) !important;
+            background: var(--text-light) !important;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+        }
+
+        /* КАТАЛОГ ТА КАРТКИ */
+        .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+
+        .card {
+            background: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 22px; border-radius: 16px; border: 1px solid var(--border-card);
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; height: 100%; box-sizing: border-box;
+            transition: var(--transition); box-shadow: var(--shadow);
+        }
+        .card:hover { transform: translateY(-5px); border-color: rgba(34, 197, 94, 0.4); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12); }
+
+        .image-wrapper {
+            height: 160px; display: flex; align-items: center; justify-content: center;
+            background: var(--card-img-bg); border-radius: 12px; margin-bottom: 18px; overflow: hidden;
+            border: 1px solid var(--border); transition: var(--transition);
+        }
+        .card img { max-width: 85%; max-height: 85%; object-fit: contain; transition: transform 0.3s ease; }
+        .card:hover img { transform: scale(1.05); }
+
+        .brand-tag { font-size: 0.72rem; background: rgba(0,0,0,0.04); padding: 4px 12px; border-radius: 6px; color: var(--gray-muted); font-weight: bold; display: inline-block; margin-bottom: 12px; text-transform: uppercase; }
+        body.theme-black .brand-tag { background: rgba(255,255,255,0.04); }
+        .product-title { font-size: 1.05rem; font-weight: 600; color: var(--text-light); min-height: 44px; margin-bottom: 15px; line-height: 1.4; }
+
+        .price {
+            color: var(--text-light); font-weight: 800; font-size: 1.45rem; margin-bottom: 18px;
+            transition: var(--transition); display: inline-block;
+        }
+        .card:hover .price { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
+
+        /* ОНОВЛЕНІ КНОПКИ КАРТКИ З ПОКРАЩЕНИМ НЕОНОМ */
+        .btn-add-cart {
+            flex: 1; padding: 13px; background: var(--btn-gradient); color: white !important;
+            text-align: center; text-decoration: none; border-radius: 12px; font-weight: 800;
+            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.8px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            box-shadow: 0 4px 14px var(--btn-glow);
+        }
+        .btn-add-cart:hover {
+            transform: translateY(-3px);
+            letter-spacing: 1.2px;
+            box-shadow: 0 8px 25px var(--btn-glow);
+            filter: brightness(1.1);
+        }
+        .btn-add-cart:active { transform: translateY(1px); }
+
+        .btn-add-compare {
+            width: 48px; background: rgba(0,0,0,0.02); color: var(--text-main); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; text-decoration: none;
+            font-size: 1.1rem; border: 1px solid var(--border); transition: var(--transition);
+        }
+        body.theme-black .btn-add-compare { background: rgba(255,255,255,0.02); }
+        .btn-add-compare:hover {
+            border-color: #ffaa00;
+            color: #ffaa00;
+            background: var(--bg-sidebar);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 170, 0, 0.2);
+        }
+
+        .admin-edit-badge {
+            position: absolute; top: 12px; right: 12px; background: rgba(255,42,42,0.1);
+            color: var(--accent) !important; padding: 5px 12px; font-size: 0.75rem; font-weight: bold;
+            border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,42,42,0.2); z-index: 6;
+        }
+
+        .bottom-admin-panel {
+            margin-top: 40px; background: var(--bg-sidebar); border: 1px solid var(--border);
+            padding: 30px; border-radius: 16px; text-align: center; box-shadow: var(--shadow);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        }
+
+        /* ФУТЕР З ПОДЯКОЮ КРУТИМ ШІ */
+        .footer-watermark {
+            text-align: center;
+            padding: 30px 0 10px 0;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--gray-muted);
+            font-weight: bold;
+            margin-top: auto;
+            line-height: 1.8;
+        }
+        .footer-watermark .author { color: var(--accent); text-shadow: 0 0 8px rgba(255, 42, 42, 0.2); }
+        .footer-watermark .ai-credits {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        .footer-watermark .ai-gemini { color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.3); }
+        .footer-watermark .ai-gpt { color: #10b981; text-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <!-- БІЧНА ПАНЕЛЬ КАТЕГОРІЙ -->
+        <div class="sidebar">
+            <h3>Категорії заліза</h3>
+            <a href="?{% if current_sort %}sort={{ current_sort }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="category-link {% if not current_category %}active{% endif %}">Усе обладнання</a>
+            {% for cat in categories_data %}
+                <a href="?category={{ cat.code }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="category-link {% if current_category == cat.code %}active{% endif %}" style="margin-top: 5px;">
+                    {{ cat.name }}
+                </a>
+                {% if current_category == cat.code %}
+                <div class="brand-list">
+                    {% for brand in cat.brands %}
+                        <a href="?category={{ cat.code }}&brand={{ brand }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="brand-link {% if current_brand == brand %}active{% endif %}">▪ {{ brand }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ОСНОВНА ЧАСТИНА -->
+        <div class="main-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert-error">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- НАВБАР -->
+            <div class="navbar">
+                <h2 onclick="location.href='{% url 'home' %}'">PC STORE</h2>
+
+                <form method="get" action="{% url 'home' %}" class="search-form">
+                    <input type="text" name="search" placeholder="Шукати девайси..." value="{{ search_query }}">
+                    <button type="submit">Пошук</button>
+                </form>
+
+                <div class="nav-right">
+                    <a href="{% url 'add_product' %}" class="admin-add-product-btn">
+                        <span>➕ Додати товар</span>
+                    </a>
+
+                    <!-- СОНЕЧКО (ПРАЦЮЄ НА ВСІХ ВКЛАДКАХ ЧЕРЕЗ LOCALSTORAGE) -->
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-btn" title="Змінити тему">
+                        ☀️
+                    </button>
+
+                    <a href="{% url 'compare_detail' %}" class="compare-btn">⚖️ ({{ compare_count }})</a>
+                    <a href="{% url 'cart_detail' %}" class="cart-btn">🛒 Кошик</a>
+
+                    <div style="border-left: 1px solid var(--border); padding-left: 15px; display: flex; gap: 10px; align-items: center;">
+                        {% if user.is_authenticated %}
+                            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                                <span style="color: var(--text-light); font-weight: bold; font-size: 0.9rem;">👋 {{ user.username }}</span>
+                                {% if user.username == 'Koti4ok' %}
+                                    <div class="status-badge admin"><div class="dot"></div>admin online</div>
+                                {% else %}
+                                    <div class="status-badge user"><div class="dot"></div>user</div>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'logout' %}" style="color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: bold; margin-left: 5px;">Вийти</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="auth-btn-login">Увійти</a>
+                            <a href="{% url 'register' %}" class="auth-btn-register">Зареєструватися</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- СОРТУВАННЯ -->
+            <div class="sort-block">
+                <a href="?sort=newest{% if current_category %}&category={{ current_category }}{% endif %}{% if current_brand %}&brand={{ current_brand }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="{% if current_sort == 'newest' or not current_sort %}active{% endif %}">Новинки</a>
+                <a href="?sort=price_low{% if current_category %}&category={{ current_category }}{% endif %}{% if current_brand %}&brand={{ current_brand }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="{% if current_sort == 'price_low' %}active{% endif %}">Спочатку дешевші</a>
+                <a href="?sort=price_high{% if current_category %}&category={{ current_category }}{% endif %}{% if current_brand %}&brand={{ current_brand }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="{% if current_sort == 'price_high' %}active{% endif %}">Спочатку дорожчі</a>
+            </div>
+
+            <!-- КАТАЛОГ КАРТОК ТОВАРУ -->
+            <div class="catalog">
+                {% for product in products %}
+                <div class="card-wrapper" id="dev-{{ product.id }}">
+                    <div class="card">
+                        {% if user.is_authenticated and user.username == 'Koti4ok' %}
+                            <a href="{% url 'edit_product' product.id %}" class="admin-edit-badge">⚡ Редагувати</a>
+                        {% endif %}
+                        <div>
+                            <div class="image-wrapper">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                    <span style="color: var(--gray-muted); font-size: 0.85rem;">No Image</span>
+                                {% endif %}
+                            </div>
+                            <span class="brand-tag">{{ product.brand }}</span>
+                            <div class="product-title">{{ product.name }}</div>
+                        </div>
+                        <div>
+                            <div class="price">{{ product.price }} ₴</div>
+                            <!-- Швидкі чисті кнопки в 1 клік -->
+                            <div style="display: flex; gap: 8px; position: relative; z-index: 5;">
+                                <a href="{% url 'add_to_cart' product.id %}" class="btn-add-cart">
+                                    <span>В кошик</span> <span>🚀</span>
+                                </a>
+                                <a href="{% url 'add_to_compare' product.id %}" class="btn-add-compare" title="Порівняти девайс">⚖️</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                    <p style="grid-column: 1/-1; text-align: center; color: var(--gray-muted); padding: 40px 0; font-weight: 500;">
+                        Каталог порожній. Додай нове залізо за допомогою кнопки вгорі!
+                    </p>
+                {% endfor %}
+            </div>
+
+            <!-- ПАНЕЛЬ АДМІНІСТРАТОРА ЗНИЗУ -->
+            <div class="bottom-admin-panel">
+                <p style="color: var(--text-light); font-weight: 600; margin-bottom: 15px; font-size: 1rem;">
+                    Потрібно розширити асортимент магазину новими девайсами?
+                </p>
+                <a href="{% url 'add_product' %}" class="admin-add-product-btn" style="padding: 12px 28px; font-size: 0.95rem;">
+                    <span>➕ Створити нову картку товару</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ОНОВЛЕНИЙ ФУТЕР З ТВОЇМИ НАПИСАМИ ТА ПОДЯКОЮ ШI -->
+    <div class="footer-watermark">
+        premium tech store // developed by: <span class="author">Koti4ok</span>
+        <span class="ai-credits">мені допомагали by:<span class="ai-gemini">Gemini</span>, by:<span class="ai-gpt">Chat gpt</span></span>
+    </div>
+
+    <script>
+        // Синхронізований ключ теми «pc-store-theme»
+        let currentTheme = localStorage.getItem('pc-store-theme') || 'glass';
+
+        function applyTheme(theme) {
+            const body = document.body;
+            const btn = document.getElementById('theme-btn');
+
+            if (theme === 'black') {
+                body.classList.add('theme-black');
+                btn.innerText = "🌙";
+            } else {
+                body.classList.remove('theme-black');
+                btn.innerText = "☀️";
+            }
+            localStorage.setItem('pc-store-theme', theme);
+        }
+
+        function toggleTheme() {
+            currentTheme = (currentTheme === 'glass') ? 'black' : 'glass';
+            applyTheme(currentTheme);
+        }
+
+        // При завантаженні сторінки зчитуємо збережений стан з пам'яті браузера
+        applyTheme(currentTheme);
+    </script>
+</body>
+</html>

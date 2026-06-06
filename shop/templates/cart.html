@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Кошик | PC Store</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0c10; color: white; padding: 40px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #45f3ff33; padding-bottom: 20px; }
+        h1 { color: #00f5ff; margin: 0; text-transform: uppercase; }
+        .cart-item { background: #141a22; border: 1px solid #2f3b4c; padding: 20px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .item-img-box { width: 70px; height: 70px; background: #1f2833; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .item-img-box img { max-width: 90%; max-height: 90%; }
+        .total-price { color: #00ffcc; font-weight: bold; font-size: 1.3rem; }
+        .footer-box { background: #141a22; padding: 25px; border-radius: 16px; border: 1px solid #45f3ff33; display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+        .btn-clear { padding: 12px 20px; background: transparent; border: 1px solid #ff3333; color: #ff3333; text-decoration: none; border-radius: 8px; font-weight: bold; }
+        .btn-clear:hover { background: #ff3333; color: white; }
+        .btn-checkout { padding: 14px 28px; background: #00ffcc; color: #000; text-decoration: none; border-radius: 8px; font-weight: 900; text-transform: uppercase; box-shadow: 0 0 15px rgba(0,255,204,0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-row">
+            <h1>🛒 Твій кошик</h1>
+            <a href="{% url 'home' %}" style="color: white; text-decoration: none;">← В магазин</a>
+        </div>
+        {% if cart_items %}
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <div style="display:flex; align-items:center; gap:20px;">
+                        <div class="item-img-box">{% if item.product.image %}<img src="{{ item.product.image.url }}">{% endif %}</div>
+                        <div>
+                            <div style="font-weight:bold; font-size:1.1rem;">{{ item.product.name }}</div>
+                            <span style="color:#ffb703; font-size:0.8rem;">{{ item.product.brand }}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:40px;">
+                        <div style="color:#8b9bb4;">{{ item.quantity }} шт.</div>
+                        <div class="total-price">{{ item.item_total }} ₴</div>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="footer-box">
+                <div>
+                    <div style="color:#8b9bb4; font-size:0.9rem;">Разом до сплати:</div>
+                    <div style="color:#00ffcc; font-size:2rem; font-weight:900;">{{ total_price }} ₴</div>
+                </div>
+                <div style="display:flex; gap:15px;">
+                    <a href="{% url 'clear_cart' %}" class="btn-clear">Очистити</a>
+                    <a href="#" class="btn-checkout" onclick="alert('Замовлення прийнято!')">Оформити</a>
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align:center; padding:60px 0; color:#8b9bb4;"><h3>Кошик порожній</h3></div>
+        {% endif %}
+    </div>
+</body>
+</html>
